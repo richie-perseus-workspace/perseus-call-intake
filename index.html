@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perseus — Call Intelligence Intake</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:               #0d0520;
+      --text:             #f0f0f8;
+      --muted:            #7a6a9a;
+      --muted-light:      #c0b0d8;
+      --purple:           #7c3aed;
+      --purple-light:     #a78bfa;
+      --green:            #22c55e;
+      --red:              #ef4444;
+      --input-bg:         rgba(255,255,255,0.05);
+      --input-border:     rgba(255,255,255,0.10);
+      --input-focus-bg:   rgba(124,58,237,0.07);
+      --input-focus-border: rgba(124,58,237,0.55);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 48px 20px 72px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* ─── Orbs ─── */
+    .bg-orbs {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .orb-1 {
+      width: 650px; height: 650px;
+      background: radial-gradient(circle, rgba(124,58,237,0.55) 0%, transparent 70%);
+      top: -200px; left: -140px;
+      filter: blur(60px);
+      animation: orbDrift1 18s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 520px; height: 520px;
+      background: radial-gradient(circle, rgba(168,85,247,0.48) 0%, transparent 70%);
+      bottom: -160px; right: -110px;
+      filter: blur(70px);
+      animation: orbDrift2 22s ease-in-out infinite;
+    }
+    .orb-3 {
+      width: 360px; height: 360px;
+      background: radial-gradient(circle, rgba(99,60,220,0.35) 0%, transparent 70%);
+      top: 38%; left: 60%;
+      filter: blur(55px);
+      animation: orbDrift3 15s ease-in-out infinite;
+    }
+    .orb-4 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(192,80,220,0.28) 0%, transparent 70%);
+      bottom: 18%; left: 4%;
+      filter: blur(50px);
+      animation: orbDrift1 20s ease-in-out infinite reverse;
+    }
+    @keyframes orbDrift1 {
+      0%,100% { transform: translate(0,0); }
+      33%      { transform: translate(40px,-30px); }
+      66%      { transform: translate(-20px,50px); }
+    }
+    @keyframes orbDrift2 {
+      0%,100% { transform: translate(0,0); }
+      40%      { transform: translate(-50px,30px); }
+      75%      { transform: translate(30px,-40px); }
+    }
+    @keyframes orbDrift3 {
+      0%,100% { transform: translate(0,0); }
+      50%      { transform: translate(-35px,45px); }
+    }
+    @media (max-width: 768px) {
+      .orb-1 { width: 350px; height: 350px; }
+      .orb-2 { width: 280px; height: 280px; }
+      .orb-3, .orb-4 { display: none; }
+    }
+
+    /* ─── Layout ─── */
+    .page-wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 660px;
+    }
+
+    /* ─── Header ─── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .wordmark {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+    .wordmark-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.5);
+    }
+    .wordmark-icon svg { width: 20px; height: 20px; color: #fff; }
+    .wordmark-text {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #a78bfa 0%, #f0f0f8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .page-title {
+      font-size: 30px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.4);
+    }
+    .page-subtitle {
+      font-size: 14px;
+      color: var(--muted-light);
+      font-weight: 400;
+      line-height: 1.5;
+      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+    }
+
+    /* ─── Card ─── */
+    .card-wrap {
+      border-radius: 20px;
+      padding: 2px;
+      background: linear-gradient(135deg,
+        rgba(124,58,237,0.55) 0%,
+        rgba(168,85,247,0.35) 50%,
+        rgba(124,58,237,0.15) 100%);
+    }
+    .card {
+      border-radius: 18px;
+      padding: 36px 36px 32px;
+      background: rgba(255,255,255,0.055);
+      transform: translateZ(0);
+    }
+    @supports (backdrop-filter: blur(16px)) {
+      .card {
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        background: rgba(255,255,255,0.048);
+      }
+    }
+    @supports not (backdrop-filter: blur(16px)) {
+      .card { background: rgba(20,10,40,0.82); }
+    }
+    @media (max-width: 520px) {
+      .card { padding: 24px 20px 22px; }
+    }
+
+    /* ─── Section label ─── */
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--purple-light);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(167,139,250,0.3), transparent);
+    }
+
+    /* ─── Form grid ─── */
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .field-full { grid-column: 1 / -1; }
+    @media (max-width: 520px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .field-full { grid-column: 1; }
+    }
+
+    /* ─── Field ─── */
+    .field { display: flex; flex-direction: column; gap: 7px; }
+
+    .field-label {
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted-light);
+    }
+    .field-label .req { color: var(--purple-light); margin-left: 2px; }
+
+    /* ─── Inputs ─── */
+    .input-wrap { position: relative; }
+    .input-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+      display: flex;
+    }
+    .input-icon svg { width: 15px; height: 15px; }
+
+    input, select, textarea {
+      width: 100%;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input, select {
+      height: 46px;
+      padding: 0 14px 0 38px;
+    }
+    input.no-icon, select.no-icon {
+      padding-left: 14px;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--input-focus-border);
+      background: var(--input-focus-bg);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.14);
+    }
+    input::placeholder, textarea::placeholder { color: var(--muted); }
+    input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(0.6) sepia(1) saturate(2) hue-rotate(220deg);
+      opacity: 0.65;
+      cursor: pointer;
+    }
+
+    /* Select arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 13px; top: 50%;
+      transform: translateY(-50%);
+      width: 0; height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid var(--muted);
+      pointer-events: none;
+    }
+    select option { background: #1a0a35; color: var(--text); }
+
+    /* Textarea */
+    textarea {
+      padding: 13px 14px;
+      resize: vertical;
+      min-height: 240px;
+      line-height: 1.65;
+      font-size: 13px;
+    }
+
+    /* Field hint */
+    .field-hint {
+      font-size: 11px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* ─── Transcript wrap with scan line ─── */
+    .transcript-wrap {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .transcript-wrap .scan-line {
+      position: absolute;
+      left: 0; right: 0;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, #a78bfa, transparent);
+      animation: scanMove 2.6s ease-in-out infinite;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 2;
+      transition: opacity 0.3s;
+    }
+    .transcript-wrap.focused .scan-line { opacity: 1; }
+    @keyframes scanMove {
+      0%   { top: 0;    opacity: 1; }
+      100% { top: 100%; opacity: 0; }
+    }
+    .transcript-wrap textarea { border-radius: 10px; }
+
+    /* ─── Divider ─── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.09), transparent);
+      margin: 26px 0;
+    }
+
+    /* ─── Submit button ─── */
+    .btn-submit {
+      width: 100%;
+      height: 52px;
+      background: linear-gradient(135deg, #7c3aed 0%, #9333ea 100%);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 4px 20px rgba(124,58,237,0.42), 0 1px 0 rgba(255,255,255,0.12) inset;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s, box-shadow 0.2s, background 0.3s;
+    }
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.14), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+    .btn-submit:hover:not(:disabled)::before { opacity: 1; }
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 7px 28px rgba(124,58,237,0.55), 0 1px 0 rgba(255,255,255,0.12) inset;
+    }
+    .btn-submit:active:not(:disabled) { transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.72; cursor: not-allowed; }
+    .btn-submit.success {
+      background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+      box-shadow: 0 4px 20px rgba(16,185,129,0.42);
+    }
+    .btn-submit.error-state {
+      background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+      box-shadow: 0 4px 20px rgba(239,68,68,0.42);
+    }
+
+    /* Spinner */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.28);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.65s linear infinite;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: rgba(26,12,50,0.96);
+      border: 1px solid rgba(255,255,255,0.11);
+      border-radius: 12px;
+      padding: 13px 20px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-size: 13.5px;
+      font-weight: 500;
+      z-index: 100;
+      transition: transform 0.38s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+      opacity: 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.45);
+      max-width: calc(100vw - 40px);
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    @supports (backdrop-filter: blur(12px)) {
+      .toast { backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    }
+    .toast-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .toast.t-success .toast-dot { background: var(--green); box-shadow: 0 0 8px var(--green); }
+    .toast.t-error   .toast-dot { background: var(--red);   box-shadow: 0 0 8px var(--red); }
+
+    /* ─── Footer ─── */
+    .page-footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 11.5px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+  <div class="orb orb-4"></div>
+</div>
+
+<div class="page-wrap">
+
+  <header class="page-header">
+    <div class="wordmark">
+      <div class="wordmark-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+        </svg>
+      </div>
+      <span class="wordmark-text">Perseus</span>
+    </div>
+    <h1 class="page-title">Call Intelligence Intake</h1>
+    <p class="page-subtitle">Submit a recorded call for AI analysis and automatic CRM note logging</p>
+  </header>
+
+  <div class="card-wrap">
+    <div class="card">
+      <form id="intakeForm" autocomplete="off" novalidate>
+
+        <div class="section-label">Call Details</div>
+
+        <div class="form-grid">
+
+          <!-- Agent -->
+          <div class="field">
+            <label class="field-label" for="agent_name">Agent <span class="req">*</span></label>
+            <div class="select-wrap input-wrap">
+              <div class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+              <select id="agent_name" required>
+                <option value="" disabled selected>Select agent</option>
+                <option value="Richie">Richie</option>
+                <option value="Nathan">Nathan</option>
+                <option value="__other__">Other...</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Call Date -->
+          <div class="field">
+            <label class="field-label" for="call_date">Call Date <span class="req">*</span></label>
+            <div class="input-wrap">
+              <div class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+                </svg>
+              </div>
+              <input type="date" id="call_date" required>
+            </div>
+          </div>
+
+          <!-- Other agent name — hidden by default -->
+          <div class="field field-full" id="otherAgentRow" style="display:none">
+            <label class="field-label" for="other_agent">Agent Name <span class="req">*</span></label>
+            <input type="text" id="other_agent" class="no-icon" placeholder="Enter full name">
+          </div>
+
+          <!-- Contact Name -->
+          <div class="field">
+            <label class="field-label" for="contact_name">Contact Name</label>
+            <div class="input-wrap">
+              <div class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                </svg>
+              </div>
+              <input type="text" id="contact_name" placeholder="Business or owner name">
+            </div>
+          </div>
+
+          <!-- Duration -->
+          <div class="field">
+            <label class="field-label" for="call_duration">Duration</label>
+            <div class="input-wrap">
+              <div class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+              </div>
+              <input type="text" id="call_duration" placeholder="e.g. 7:03">
+            </div>
+          </div>
+
+          <!-- LACRM Link -->
+          <div class="field field-full">
+            <label class="field-label" for="lacrm_link">LACRM Contact Link <span class="req">*</span></label>
+            <div class="input-wrap">
+              <div class="input-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+              </div>
+              <input type="url" id="lacrm_link" placeholder="https://www.lessannoyingcrm.com/contact/..." required>
+            </div>
+            <span class="field-hint">Copy from the Google Chat Prospect Activity alert</span>
+          </div>
+
+        </div>
+
+        <div class="divider"></div>
+        <div class="section-label">Transcript</div>
+
+        <div class="form-grid">
+          <div class="field field-full">
+            <label class="field-label" for="transcript">Call Transcript <span class="req">*</span></label>
+            <div class="transcript-wrap" id="transcriptWrap">
+              <div class="scan-line"></div>
+              <textarea id="transcript" placeholder="Paste the full Apple call transcript here...&#10;&#10;Participant&#10;Hello, thank you for calling...&#10;&#10;You&#10;Hi, this is Richie from Perseus..." required></textarea>
+            </div>
+            <span class="field-hint">Paste directly from iPhone. <strong style="color:var(--purple-light)">You</strong> and <strong style="color:var(--purple-light)">Participant</strong> labels are detected and mapped automatically.</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">
+          <svg id="btnIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 2 11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+          <span id="btnText">Submit for Analysis</span>
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+  <footer class="page-footer">
+    Perseus Intelligence System &nbsp;·&nbsp; Internal Use Only
+  </footer>
+
+</div>
+
+<div class="toast" id="toast">
+  <div class="toast-dot"></div>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+  // Default to today
+  (function() {
+    var d = new Date();
+    var yyyy = d.getFullYear();
+    var mm = String(d.getMonth() + 1).padStart(2, '0');
+    var dd = String(d.getDate()).padStart(2, '0');
+    document.getElementById('call_date').value = yyyy + '-' + mm + '-' + dd;
+  })();
+
+  // Agent dropdown — show/hide Other field
+  document.getElementById('agent_name').addEventListener('change', function() {
+    var row = document.getElementById('otherAgentRow');
+    var inp = document.getElementById('other_agent');
+    if (this.value === '__other__') {
+      row.style.display = '';
+      inp.required = true;
+    } else {
+      row.style.display = 'none';
+      inp.required = false;
+      inp.value = '';
+    }
+  });
+
+  // Transcript — scan animation on focus
+  var txWrap = document.getElementById('transcriptWrap');
+  var txArea = document.getElementById('transcript');
+  txArea.addEventListener('focus', function() { txWrap.classList.add('focused'); });
+  txArea.addEventListener('blur',  function() { txWrap.classList.remove('focused'); });
+
+  // Textarea auto-resize
+  txArea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = Math.max(240, this.scrollHeight) + 'px';
+  });
+
+  // Toast helper
+  function showToast(msg, type) {
+    var t = document.getElementById('toast');
+    var m = document.getElementById('toastMsg');
+    t.className = 'toast t-' + type;
+    m.textContent = msg;
+    t.classList.add('show');
+    setTimeout(function() { t.classList.remove('show'); }, 4500);
+  }
+
+  // Parse Apple transcript: "You" / "Participant" labels
+  function parseTranscript(raw) {
+    var lines = raw.split('\n');
+    var out = [];
+    var speaker = null;
+    var buf = [];
+
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (line === 'You') {
+        if (speaker && buf.length) out.push(speaker + ': ' + buf.join(' ').trim());
+        speaker = 'SETTER'; buf = [];
+      } else if (line === 'Participant') {
+        if (speaker && buf.length) out.push(speaker + ': ' + buf.join(' ').trim());
+        speaker = 'PROSPECT'; buf = [];
+      } else if (line && speaker) {
+        buf.push(line);
+      }
+    }
+    if (speaker && buf.length) out.push(speaker + ': ' + buf.join(' ').trim());
+    return out.join('\n');
+  }
+
+  // Button state helpers
+  var ICON_SEND = '<svg id="btnIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 2 11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+  var ICON_CHECK = '<svg id="btnIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  var ICON_X    = '<svg id="btnIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+
+  function setBtnState(state, text) {
+    var btn = document.getElementById('submitBtn');
+    var iconSlot = document.getElementById('btnIcon');
+    var textEl = document.getElementById('btnText');
+    btn.className = 'btn-submit' + (state === 'success' ? ' success' : state === 'error' ? ' error-state' : '');
+    btn.disabled = (state === 'loading' || state === 'success');
+
+    if (state === 'loading') {
+      iconSlot.outerHTML = '<div class="spinner" id="btnIcon"></div>';
+    } else if (state === 'success') {
+      document.getElementById('btnIcon').outerHTML = ICON_CHECK;
+    } else if (state === 'error') {
+      document.getElementById('btnIcon').outerHTML = ICON_X;
+    } else {
+      document.getElementById('btnIcon').outerHTML = ICON_SEND;
+    }
+    document.getElementById('btnText').textContent = text;
+  }
+
+  // Form submit
+  document.getElementById('intakeForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    var agentSel = document.getElementById('agent_name').value;
+    var agentName = agentSel === '__other__'
+      ? document.getElementById('other_agent').value.trim()
+      : agentSel;
+    var callDate      = document.getElementById('call_date').value;
+    var contactName   = document.getElementById('contact_name').value.trim();
+    var callDuration  = document.getElementById('call_duration').value.trim() || 'N/A';
+    var lacrmLink     = document.getElementById('lacrm_link').value.trim();
+    var rawTranscript = document.getElementById('transcript').value.trim();
+
+    // Validation
+    if (!agentName)     { showToast('Select or enter an agent name.', 'error'); return; }
+    if (!callDate)      { showToast('Pick a call date.', 'error'); return; }
+    if (!lacrmLink)     { showToast('Paste the LACRM contact link.', 'error'); return; }
+    if (!lacrmLink.includes('lessannoyingcrm.com/contact/')) {
+      showToast('That doesn\'t look like a LACRM contact link.', 'error'); return;
+    }
+    if (!rawTranscript) { showToast('Paste the call transcript.', 'error'); return; }
+
+    var formattedTranscript = parseTranscript(rawTranscript);
+
+    setBtnState('loading', 'Analyzing...');
+
+    fetch('/api/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        agent_name:           agentName,
+        call_date:            callDate,
+        contact_name:         contactName,
+        call_duration:        callDuration,
+        lacrm_link:           lacrmLink,
+        transcript:           rawTranscript,
+        formatted_transcript: formattedTranscript
+      })
+    })
+    .then(function(res) {
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return res.json().catch(function() { return {}; });
+    })
+    .then(function() {
+      setBtnState('success', 'Submitted — Note Being Written');
+      showToast('Call submitted. AI analysis in progress.', 'success');
+      setTimeout(function() { setBtnState('default', 'Submit for Analysis'); }, 3500);
+    })
+    .catch(function() {
+      setBtnState('error', 'Something Went Wrong');
+      showToast('Submission failed — check your connection and try again.', 'error');
+      setTimeout(function() { setBtnState('default', 'Submit for Analysis'); }, 3500);
+    });
+  });
+</script>
+</body>
+</html>
